@@ -1,14 +1,12 @@
 package coolalias.arcanelegacy.inventory;
 
-import java.util.UUID;
-
-import coolalias.arcanelegacy.item.ItemScroll;
-import coolalias.arcanelegacy.item.ItemWand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import coolalias.arcanelegacy.item.ItemScroll;
+import coolalias.arcanelegacy.item.ItemWand;
 
 public class InventoryWand implements IInventory
 {
@@ -49,7 +47,7 @@ public class InventoryWand implements IInventory
 
 		wand.getTagCompound().setByte("WandActiveSlot", (byte) activeSlot);
 	}
-	
+
 	/**
 	 * Sets the active slot index to the previous index within the inventory size
 	 */
@@ -68,8 +66,7 @@ public class InventoryWand implements IInventory
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int slot)
-	{
+	public ItemStack getStackInSlot(int slot) {
 		if (slot == ACTIVE_SLOT) { return inventory[wand.getTagCompound().getByte("WandActiveSlot")]; }
 		else { return inventory[slot]; }
 	}
@@ -78,13 +75,13 @@ public class InventoryWand implements IInventory
 	public ItemStack decrStackSize(int slot, int amount)
 	{
 		ItemStack stack = getStackInSlot(slot);
-		
+
 		if (stack != null)
 		{
 			if (stack.stackSize > amount)
 			{
 				stack = stack.splitStack(amount);
-				
+
 				if (stack.stackSize == 0) {
 					setInventorySlotContents(slot, null);
 				}

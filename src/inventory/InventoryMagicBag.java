@@ -1,11 +1,11 @@
 package coolalias.arcanelegacy.inventory;
 
-import coolalias.arcanelegacy.item.ItemMagicBag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import coolalias.arcanelegacy.item.ItemMagicBag;
 
 public class InventoryMagicBag implements IInventory
 {
@@ -59,8 +59,7 @@ public class InventoryMagicBag implements IInventory
 	}
 
 	@Override
-	public ItemStack getStackInSlotOnClosing(int slot)
-	{
+	public ItemStack getStackInSlotOnClosing(int slot) {
 		ItemStack stack = getStackInSlot(slot);
 		setInventorySlotContents(slot, null);
 		return stack;

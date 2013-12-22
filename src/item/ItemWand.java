@@ -23,42 +23,29 @@ public class ItemWand extends Item
 	/** Set each time the wand starts charging */
 	private int wandCastTime = 0;
 
+	@SideOnly(Side.CLIENT)
 	private Icon[] iconArray;
+
 	String iconName = null;
 
-	public ItemWand(int par1)
-	{
+	public ItemWand(int par1) {
 		super(par1);
 		this.maxStackSize = 1;
 		this.setMaxDamage(256);
 	}
 
-	public int getWandCastTime()
-	{
-		return this.wandCastTime;
-	}
+	/** Returns number of ticks required for wand to cast currently equipped spell */
+	public int getWandCastTime() { return wandCastTime; }
 
-	public void setWandCastTime(int par1)
-	{
-		this.wandCastTime = par1;
-	}
+	/** Sets the number of ticks required for the wand to cast currently equipped spell */
+	public void setWandCastTime(int par1) { wandCastTime = par1; }
 
 	@Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack)
-	{
-		return 72000;
-	}
+	public int getMaxItemUseDuration(ItemStack itemstack) { return 72000; }
 
 	@Override
-	public EnumAction getItemUseAction(ItemStack par1ItemStack)
-	{
-		return EnumAction.bow;
-	}
+	public EnumAction getItemUseAction(ItemStack itemstack) { return EnumAction.bow; }
 
-	/**
-	 * Called whenever this item is equipped and the right mouse button is pressed.
-	 * Args: itemStack, world, entityPlayer
-	 */
 	@Override
 	public ItemStack onItemRightClick(ItemStack wand, World world, EntityPlayer player)
 	{
@@ -77,14 +64,10 @@ public class ItemWand extends Item
 		return wand;
 	}
 
-	/**
-	 * called when the player releases the use item button.
-	 * Args: itemstack, world, entityplayer, itemInUseCount
-	 */
 	@Override
 	public void onPlayerStoppedUsing(ItemStack wand, World world, EntityPlayer player, int par4)
 	{
-		System.out.println("[WAND] on stopped using");
+		System.out.println("[WAND] on stopped using; world is " + world.isRemote);
 		int ticksInUse = this.getMaxItemUseDuration(wand) - par4;
 		ArrowLooseEvent event = new ArrowLooseEvent(player, wand, ticksInUse);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -129,48 +112,39 @@ public class ItemWand extends Item
 				// play spell failure sound
 				System.out.println("[WAND] Armor interfered - spell failed!");
 			}
-			
+
 			damageWand(wand, world, player);
 		}
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean shouldRotateAroundWhenRendering() {
-		return true;
-	}
+	public boolean shouldRotateAroundWhenRendering() { return true; }
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IconRegister iconRegister)
 	{
-		this.itemIcon = iconRegister.registerIcon(ModInfo.ID + ":" + this.getIconName().toLowerCase() + "_0");
-		this.iconArray = new Icon[4];
+		itemIcon = iconRegister.registerIcon(ModInfo.ID + ":" + getIconName().toLowerCase() + "_0");
+		iconArray = new Icon[4];
 
-		for (int i = 0; i < this.iconArray.length; ++i)
-		{
-			this.iconArray[i] = iconRegister.registerIcon(ModInfo.ID + ":" + this.iconName.toLowerCase() + "_" + i);
+		for (int i = 0; i < iconArray.length; ++i) {
+			iconArray[i] = iconRegister.registerIcon(ModInfo.ID + ":" + iconName.toLowerCase() + "_" + i);
 		}
 	}
 
-	private String getIconName() {
+	private String getIconName()
+	{
 		this.iconName = this.getUnlocalizedName().substring(5);
 
-		if (iconName.contains("wand_Wood"))
-		{
+		if (iconName.contains("wand_Wood")) {
 			iconName = "wand_wood";
-		}
-		else if (iconName.contains("wand_Bone"))
-		{
+		} else if (iconName.contains("wand_Bone")) {
 			iconName = "wand_bone";
-		}
-		else if (iconName.contains("wand_Blaze"))
-		{
+		} else if (iconName.contains("wand_Blaze")) {
 			iconName = "wand_blaze";
-		}
-		else
-		{
-		}
+		} else {}
+
 		return iconName;
 	}
 
@@ -179,22 +153,19 @@ public class ItemWand extends Item
 	public Icon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining)
 	{
 		if (usingItem == null) return this.itemIcon;
+
 		int ticksInUse = stack.getMaxItemUseDuration() - useRemaining;
 		int index = this.wandCastTime - ticksInUse;
 
-		if (ticksInUse > this.wandCastTime)
-		{
+		if (ticksInUse > this.wandCastTime) {
 			return this.iconArray[3];
-		}
-		else if (ticksInUse > 0 && (index % 4 == 2 || index % 4 == 3))
-		{
+		} else if (ticksInUse > 0 && (index % 4 == 2 || index % 4 == 3)) {
 			return this.iconArray[2];
-		}
-		else if (ticksInUse > 0  && (index % 4 == 0 || index % 4 == 1))
-		{
+		} else if (ticksInUse > 0  && (index % 4 == 0 || index % 4 == 1)) {
 			return this.iconArray[1];
+		} else {
+			return this.iconArray[0];
 		}
-		return this.iconArray[0];
 	}
 
 	/**

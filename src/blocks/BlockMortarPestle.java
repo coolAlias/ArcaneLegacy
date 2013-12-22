@@ -2,16 +2,9 @@ package coolalias.arcanelegacy.blocks;
 
 import java.util.Random;
 
-import coolalias.arcanelegacy.ArcaneLegacy;
-import coolalias.arcanelegacy.ModInfo;
-import coolalias.arcanelegacy.tileentity.TileEntityMortarPestle;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -19,24 +12,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import coolalias.arcanelegacy.ArcaneLegacy;
+import coolalias.arcanelegacy.ModInfo;
+import coolalias.arcanelegacy.tileentity.TileEntityMortarPestle;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockMortarPestle extends BlockContainer
 {
 	private final boolean isActive;
 
-	/**
-	 * This flag is used to prevent the furnace inventory to be dropped upon block removal, is used internally when the
-	 * furnace block changes from idle to active and vice-versa.
-	 */
 	private static boolean keepInventory;
 
 	@SideOnly(Side.CLIENT)
 	private Icon iconTop;
+
 	@SideOnly(Side.CLIENT)
 	private Icon iconFront;
 
-	public BlockMortarPestle(int id, boolean active)
-	{
+	public BlockMortarPestle(int id, boolean active) {
 		super(id, Material.rock);
 		setHardness(2.0F);
 		setResistance(5.0F);
@@ -44,60 +38,20 @@ public class BlockMortarPestle extends BlockContainer
 		this.isActive = active;
 	}
 
-	/**
-	 * Called whenever the block is added into the world. Args: world, x, y, z
-	 */
-	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
-		super.onBlockAdded(world, x, y, z);
-		// this.setDefaultDirection(world, par2, par3, par4);
-	}
-
-	/**
-	 * Called when the block is placed in the world.
-	 */
-	@Override
-	public void onBlockPlacedBy(World world, int par2, int par3, int par4, EntityLivingBase par5EntityLivingBase, ItemStack par6ItemStack)
-	{
-		/*
-		int l = MathHelper.floor_double((double)(par5EntityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-
-		if (l == 0) { world.setBlockMetadataWithNotify(par2, par3, par4, 2, 2); }
-
-		if (l == 1) { world.setBlockMetadataWithNotify(par2, par3, par4, 5, 2); }
-
-		if (l == 2) { world.setBlockMetadataWithNotify(par2, par3, par4, 3, 2); }
-
-		if (l == 3) { world.setBlockMetadataWithNotify(par2, par3, par4, 4, 2); }
-		*/
-		
-		if (par6ItemStack.hasDisplayName())
-		{
-			((TileEntityMortarPestle) world.getBlockTileEntity(par2, par3, par4)).setGuiDisplayName(par6ItemStack.getDisplayName());
-		}
-	}
-
-	/**
-	 * Called upon block activation (right click on the block.)
-	 */
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int metadata, float what, float these, float are)
 	{
-		if (!world.isRemote)
-		{
+		if (!world.isRemote) {
 			TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
 
-			if (tileEntity != null && !player.isSneaking())
+			if (tileEntity != null && !player.isSneaking()) {
 				player.openGui(ArcaneLegacy.instance, ArcaneLegacy.mortarPestleGuiId, world, x, y, z);
+			}
 		}
 
 		return true;
 	}
 
-	/**
-	 * Update which block ID the mortar pestle is using depending on whether or not it is grinding
-	 */
 	public static void updateMortarPestleBlockState(boolean active, World world, int x, int y, int z)
 	{
 		int l = world.getBlockMetadata(x, y, z);
@@ -134,9 +88,6 @@ public class BlockMortarPestle extends BlockContainer
 		}
 	}
 
-	/**
-	 * Ejects contained items into the world, and notifies neighbours of an update, as appropriate
-	 */
 	@Override
 	public void breakBlock(World world, int x, int y, int z, int id, int meta)
 	{
@@ -176,9 +127,6 @@ public class BlockMortarPestle extends BlockContainer
 		return ALBlocks.mortarPestleIdle.blockID;
 	}
 
-	/**
-	 * Only called by clickMiddleMouseButton , and passed to inventory.setCurrentItem (along with isCreative)
-	 */
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int idPicked(World world, int x, int y, int z) {
@@ -190,10 +138,6 @@ public class BlockMortarPestle extends BlockContainer
 		return new TileEntityMortarPestle();
 	}
 
-	/**
-	 * When this method is called, your block should register all the icons it needs with the given IconRegister. This
-	 * is the only chance you get to register icons.
-	 */
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IconRegister par1IconRegister)
@@ -203,37 +147,9 @@ public class BlockMortarPestle extends BlockContainer
 		this.iconTop = par1IconRegister.registerIcon(this.isActive ? (ModInfo.ID + ":mortar_pestle_top_active") : (ModInfo.ID + ":mortar_pestle_top_idle"));
 	}
 
-	/**
-	 * From the specified side and block metadata retrieves the blocks texture.
-	 * Args: side, metadata
-	 */
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Icon getIcon(int side, int meta) {
 		return side == 1 ? this.iconTop : (side == 0 ? this.iconTop : (side != meta ? this.blockIcon : this.iconFront));
 	}
-
-	/**
-	 * Set a blocks direction
-	 */
-	/*
-	private void setDefaultDirection(World world, int x, int y, int z)
-	{
-		if (!world.isRemote)
-		{
-			int l = world.getBlockId(x, y, z - 1);
-			int i1 = world.getBlockId(x, y, z + 1);
-			int j1 = world.getBlockId(x - 1, y, z);
-			int k1 = world.getBlockId(x + 1, y, z);
-			byte direction = 3;
-
-			if (Block.opaqueCubeLookup[l] && !Block.opaqueCubeLookup[i1]){ direction = 3;}
-			if (Block.opaqueCubeLookup[i1] && !Block.opaqueCubeLookup[l]){ direction = 2;}
-			if (Block.opaqueCubeLookup[j1] && !Block.opaqueCubeLookup[k1]){ direction = 5;}
-			if (Block.opaqueCubeLookup[k1] && !Block.opaqueCubeLookup[j1]){ direction = 4;}
-			
-			world.setBlockMetadataWithNotify(x, y, z, direction, 2);
-		}
-	}
-	*/
 }

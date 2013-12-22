@@ -20,8 +20,7 @@ public class ItemScroll extends ItemScrollBase
 	 * GROWTH spells will apply bonemeal effect a number of times equal to spell's duration
 	 * ICE_SPELL's first effect defines the block to create, additional effects add POTION effects.
 	 * TELEPORT only works for entity that casts the spell. Uses amplifier[0] for max distance. */
-	public static enum SpellType
-	{
+	public static enum SpellType {
 		GENERIC, BANISH, CHARM, CREATE_BLOCK, DISPEL, EGRESS, FEATHER_FALL, FIRE_SPELL,
 		FLY_SPELL, GROWTH, ICE_SPELL, JUMP_SPELL, POTION, PROTECTION, RESURRECT,
 		SPIDER_CLIMB, SUMMON, TELEPORT, WILT
@@ -105,16 +104,14 @@ public class ItemScroll extends ItemScrollBase
 	 * Basic spell scroll constructor. Default parameter values:
 	 * Duration = 1 tick, Cast time = 10, Chance = 1.0F, all else 0
 	 */
-	public ItemScroll(int par1)
-	{
+	public ItemScroll(int par1) {
 		this(par1, SpellType.GENERIC, 0, 1, 0, 1.0F, Range.GENERIC, 10, 0.0D, 0.0D, false);
 	}
 
 	/**
 	 * Creates a new spell scroll of specified Type and CastTime. Duration is 1 tick, chance 1.0F, all else 0.
 	 */
-	public ItemScroll(int par1, SpellType par2EffectType, int par8CastTime)
-	{
+	public ItemScroll(int par1, SpellType par2EffectType, int par8CastTime) {
 		this(par1, par2EffectType, 0, 1, 0, 1.0F, Range.GENERIC, par8CastTime, 0.0D, 0.0D, false);
 	}
 
@@ -127,8 +124,7 @@ public class ItemScroll extends ItemScrollBase
 	 * @param par8CastTime: Time required to cast spell
 	 * @param par11isInSeconds: sets duration in seconds if true, in ticks if false
 	 */
-	public ItemScroll(int par1, SpellType par2EffectType, int par3EffectID, int par4Duration, int par8CastTime, boolean par11isInSeconds)
-	{
+	public ItemScroll(int par1, SpellType par2EffectType, int par3EffectID, int par4Duration, int par8CastTime, boolean par11isInSeconds) {
 		this(par1, par2EffectType, par3EffectID, par4Duration, 0, 1.0F, Range.GENERIC, par8CastTime, 0.0D, 0.0D, par11isInSeconds);
 	}
 
@@ -166,70 +162,43 @@ public class ItemScroll extends ItemScrollBase
 	}
 
 	/** Returns the scroll's Type - used to determine how to handle spell when cast. */
-	public final SpellType getEffectType()
-	{
-		return this.effectType;
-	}
+	public final SpellType getEffectType() { return effectType; }
 
 	/** Returns effect ID of primary effect */
-	public final int getEffectID()
-	{
-		return this.effectID[0];
-	}
+	public final int getEffectID() { return effectID[0]; }
 
 	/** Returns effect ID of effect[index] */
-	public final int getEffectID(int index)
-	{
-		return this.effectID[index];
-	}
+	public final int getEffectID(int index) { return effectID[index]; }
 
 	/** Returns total number of effects for this scroll */
-	public final int getNumEffects()
-	{
-		return this.numEffects;
-	}
+	public final int getNumEffects() { return numEffects; }
 
 	/** Returns duration of the primary effect */
-	public final int getDuration()
-	{
-		return this.duration[0];
-	}
+	public final int getDuration() { return duration[0]; }
 
 	/** Sets first scroll effect duration, in seconds if inSeconds is true */
-	public final ItemScroll setDuration(int duration, boolean inSeconds)
-	{
-		this.setDuration(0, duration, inSeconds);
+	public final ItemScroll setDuration(int duration, boolean inSeconds) {
+		setDuration(0, duration, inSeconds);
 		return this;
 	}
 
 	/** Returns duration of effect[index] */
-	public final int getDuration(int index)
-	{
-		return this.duration[index];
-	}
+	public final int getDuration(int index) { return duration[index]; }
 
 	/** Sets scroll effect duration in index, in seconds if inSeconds is true unless duration parameter equals -1 */
-	private final void setDuration(int index, int duration, boolean inSeconds)
-	{
+	private final void setDuration(int index, int duration, boolean inSeconds) {
 		this.duration[index] = (inSeconds && duration != -1 ? duration * 20 : duration);
 	}
 
 	/** Returns amplifier of primary effect */
-	public final int getAmplifier()
-	{
-		return amplifier[0];
-	}
+	public final int getAmplifier() { return amplifier[0]; }
 
 	/** Returns amplifier of effect[index] */
-	public final int getAmplifier(int index)
-	{
-		return amplifier[index];
-	}
+	public final int getAmplifier(int index) { return amplifier[index]; }
 
 	/** Sets amplifier for primary effect */
-	public final ItemScroll setAmplifier(int par1)
-	{
-		this.amplifier[0] = par1;
+	public final ItemScroll setAmplifier(int par1) {
+		amplifier[0] = par1;
 		return this;
 	}
 
@@ -238,164 +207,93 @@ public class ItemScroll extends ItemScrollBase
 	 * Probability may be scaled based on distance from point of impact,
 	 * so values greater than 1.0 are allowed.
 	 */
-	public final float getChance(int index)
-	{
-		return chance[index];
-	}
+	public final float getChance(int index) { return chance[index]; }
 
-	/**
-	 * Set scroll chance[index] to value.
-	 */
-	public final ItemScroll setChance(int index, float value)
-	{
-		this.chance[index] = value;
+	/** Set scroll chance[index] to value. */
+	public final ItemScroll setChance(int index, float value) {
+		chance[index] = value;
 		return this;
 	}
 
-	/**
-	 * Returns number of ticks required to cast the spell from a scroll
-	 */
-	public final int getCastTime()
-	{
-		return this.castTime;
-	}
+	/** Returns number of ticks required to cast the spell from a scroll */
+	public final int getCastTime() { return castTime; }
 
-	/**
-	 * Sets time required to cast spell, in ticks
-	 */
-	public final ItemScroll setCastTime(int castTime)
-	{
+	/** Sets time required to cast spell, in ticks */
+	public final ItemScroll setCastTime(int castTime) {
 		this.castTime = castTime;
 		return this;
 	}
 
-	/**
-	 * Returns range definition of spell: GENERIC, SELF, TOUCH, MISSILE, BEAM, CONE.
-	 */
-	public final Range getRange()
-	{
-		return this.range;
-	}
+	/** Returns range definition of spell: GENERIC, SELF, TOUCH, MISSILE, BEAM, CONE. */
+	public final Range getRange() { return range; }
 
-	/**
-	 * Sets scroll's range to value: GENERIC, SELF, TOUCH, MISSILE, BEAM, CONE.
-	 */
-	public final ItemScroll setRange(Range range)
-	{
+	/** Sets scroll's range to value: GENERIC, SELF, TOUCH, MISSILE, BEAM, CONE. */
+	public final ItemScroll setRange(Range range) {
 		this.range = range;
 		return this;
 	}
 
-	/**
-	 * Returns damage inflicted by this spell; may be scaled with distance.
-	 */
-	public final double getScrollDamage()
-	{
-		return this.scrollDamage;
-	}
+	/** Returns damage inflicted by this spell; may be scaled with distance. */
+	public final double getScrollDamage() { return scrollDamage; }
 
-	/**
-	 * Sets damage inflicted by this scroll. Damage will be scaled with distance.
-	 */
-	public final ItemScroll setDamage(double damage)
-	{
+	/** Sets damage inflicted by this scroll. Damage will be scaled with distance. */
+	public final ItemScroll setDamage(double damage) {
 		this.scrollDamage = damage;
 		this.isDmgScaled = true;
 		return this;
 	}
 
-	/**
-	 * Sets damage inflicted by this scroll and whether it is scaled with distance or not.
-	 */
-	public final ItemScroll setDamage(double damage, boolean isScaled)
-	{
+	/** Sets damage inflicted by this scroll and whether it is scaled with distance or not. */
+	public final ItemScroll setDamage(double damage, boolean isScaled) {
 		this.scrollDamage = damage;
 		this.isDmgScaled = isScaled;
 		return this;
 	}
 
-	/**
-	 * Returns true if damage should be scaled based on distance from point of impact.
-	 */
-	public final boolean isDamageScaled()
-	{
-		return this.isDmgScaled;
-	}
+	/** Returns true if damage should be scaled based on distance from point of impact. */
+	public final boolean isDamageScaled() { return this.isDmgScaled; }
 
-	/**
-	 * Sets whether damage should be scaled based on distance from point of impact.
-	 */
-	public final ItemScroll setDamageScaled(boolean isScaled)
-	{
+	/** Sets whether damage should be scaled based on distance from point of impact. */
+	public final ItemScroll setDamageScaled(boolean isScaled) {
 		this.isDmgScaled = isScaled;
 		return this;
 	}
 
-	/**
-	 * Returns multiplier for distance to knock targets back.
-	 */
-	public final int getKnockback()
-	{
-		return this.knockback;
-	}
+	/** Returns multiplier for distance to knock targets back. */
+	public final int getKnockback() { return this.knockback; }
 
-	/**
-	 * Sets value of knockback variable for this scroll. Hard-capped at MAX_KNOCKBACK.
-	 */
-	public final ItemScroll setKnockback(int value)
-	{
+	/** Sets value of knockback variable for this scroll. Hard-capped at MAX_KNOCKBACK. */
+	public final ItemScroll setKnockback(int value) {
 		this.knockback = (value > MAX_KNOCKBACK ? MAX_KNOCKBACK : value);
 		return this;
 	}
 
-	/**
-	 * Returns true if probability should be scaled based on distance from point of impact.
-	 */
-	public final boolean isChanceScaled()
-	{
-		return this.isChanceScaled;
-	}
+	/** Returns true if probability should be scaled based on distance from point of impact. */
+	public final boolean isChanceScaled() { return this.isChanceScaled; }
 
-	/**
-	 * Sets whether probability should be scaled based on distance from point of impact.
-	 */
-	public final ItemScroll setChanceScaled(boolean isScaled)
-	{
+	/** Sets whether probability should be scaled based on distance from point of impact. */
+	public final ItemScroll setChanceScaled(boolean isScaled) {
 		this.isChanceScaled = isScaled;
 		return this;
 	}
 
-	/**
-	 * Returns the radius of the bounding box in which this scroll will check for targets.
-	 */
-	public final double getAreaOfEffect()
-	{
-		return this.area;
-	}
+	/** Returns the radius of the bounding box in which this scroll will check for targets. */
+	public final double getAreaOfEffect() { return area; }
 
 	/**
 	 * Set the radius of the bounding box in which to check for targets.
 	 * Must be greater than 0 to affect blocks.
 	 */
-	public final ItemScroll setEffectRadius(double radius)
-	{
+	public final ItemScroll setEffectRadius(double radius) {
 		this.area = radius;
 		return this;
 	}
 
-	/**
-	 * Returns true if the spell creates an aura.
-	 */
-	public final boolean isAura()
-	{
-		return this.isAura;
-	}
+	/** Returns true if the spell creates an aura. */
+	public final boolean isAura() { return isAura; }
 
-	/**
-	 * Sets whether spell is an aura effect.
-	 */
-	public final ItemScroll setIsAura(boolean aura)
-	{
+	/** Sets whether spell is an aura effect. */
+	public final ItemScroll setIsAura(boolean aura) {
 		this.isAura = aura;
 		return this;
 	}
@@ -426,8 +324,7 @@ public class ItemScroll extends ItemScrollBase
 	{
 		if (this.numEffects < this.MAX_EFFECTS) {
 			return this.addScrollEffect(effectID, this.duration[0], this.amplifier[0], this.chance[0], false);
-		}
-		else {
+		} else {
 			System.out.println("[WARNING] Too many scroll effects added!");
 			return this;
 		}
@@ -444,49 +341,29 @@ public class ItemScroll extends ItemScrollBase
 			this.amplifier[this.numEffects] = amplifier;
 			this.chance[this.numEffects] = chance;
 			++this.numEffects;
-		}
-		else {
+		} else {
 			System.out.println("[WARNING] Too many scroll effects added!");
 		}
+
 		return this;
 	}
 
-	/**
-	 * Returns true if the scroll has a status icon to display when in a wand's active slot.
-	 */
+	/** Returns true if the scroll has a status icon to display when in a wand's active slot. */
 	@SideOnly(Side.CLIENT)
-	public final boolean hasStatusIcon()
-	{
-		return this.statusIconIndex >= 0;
-	}
+	public final boolean hasStatusIcon() { return statusIconIndex >= 0; }
 
-	/**
-	 * Returns the index for the icon to display when the scroll is active.
-	 */
+	/** Returns the index for the icon to display when the scroll is active. */
 	@SideOnly(Side.CLIENT)
-	public final int getStatusIconIndex()
-	{
-		return this.statusIconIndex;
-	}
+	public final int getStatusIconIndex() { return statusIconIndex; }
 
-	/**
-	 * Used to set the scrolls status icon index for display when active
-	 */
-	public final ItemScroll setStatusIconIndex(int index)
-	{
+	/** Used to set the scrolls status icon index for display when active */
+	public final ItemScroll setStatusIconIndex(int index) {
 		this.statusIconIndex = index;
 		return this;
 	}
 
-	/*
-	 * OVERRIDE METHODS
-	 */
-	/**
-	 * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
-	 */
 	@Override
-	public ItemStack onItemRightClick(ItemStack scroll, World world, EntityPlayer player)
-	{
+	public ItemStack onItemRightClick(ItemStack scroll, World world, EntityPlayer player) {
 		ArrowNockEvent event = new ArrowNockEvent(player, scroll);
 		MinecraftForge.EVENT_BUS.post(event);
 		if (event.isCanceled()) { return event.result; }
@@ -494,10 +371,6 @@ public class ItemScroll extends ItemScrollBase
 		return scroll;
 	}
 
-	/**
-	 * called when the player releases the use item button.
-	 * Args: itemstack, world, entityplayer, itemInUseCount
-	 */
 	@Override
 	public void onPlayerStoppedUsing(ItemStack scroll, World world, EntityPlayer player, int par4)
 	{
@@ -509,7 +382,7 @@ public class ItemScroll extends ItemScrollBase
 			System.out.println("[SCROLL] Spell must have been interrupted. Damn.");
 			return;
 		}
-		
+
 		ticksInUse = event.charge;
 
 		if (ticksInUse < ((ItemScroll)scroll.getItem()).getCastTime())
@@ -541,18 +414,18 @@ public class ItemScroll extends ItemScrollBase
 			}
 		}
 	}
-	
+
 	@Override
 	public void onUsingItemTick(ItemStack stack, EntityPlayer player, int count)
-    {
+	{
 		//if (!player.worldObj.isRemote) { return; }
-		
+
 		ExtendedPlayer props = ExtendedPlayer.get(player);
 
 		if (props.isCasting && !props.wasInterrupted)
 		{
 			int ticksInUse = getMaxItemUseDuration(stack) - count;
-			
+
 			if (ticksInUse % 4 == 0)
 			{
 				double posX = player.posX - (double)(MathHelper.cos(player.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
@@ -562,7 +435,7 @@ public class ItemScroll extends ItemScrollBase
 				double motionX = (double)(-MathHelper.sin(player.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float)Math.PI) * f);
 				double motionZ = (double)(MathHelper.cos(player.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float)Math.PI) * f);
 				double motionY = (double)(-MathHelper.sin((player.rotationPitch + 2.0F) / 180.0F * (float)Math.PI) * f);
-				
+
 				if (ticksInUse < ((ItemScroll) stack.getItem()).getCastTime()) {
 					player.worldObj.spawnParticle("smoke", posX + motionX, posY + motionY, posZ + motionZ, player.motionX, player.motionY + 0.1D, player.motionZ);
 				}
@@ -571,19 +444,14 @@ public class ItemScroll extends ItemScrollBase
 				}
 			}
 		}
-    }
+	}
 
-	/**
-	 * A wrapper method to get the protected movingobjectposition
-	 */
 	@Override
 	public MovingObjectPosition getMovingObjectPositionFromPlayer(World world, EntityPlayer player, boolean par3) {
 		return super.getMovingObjectPositionFromPlayer(world, player, par3);
 	}
-	
-	/**
-	 * Sets status icon index accounting for potential missing items from Config settings
-	 */
+
+	/** Sets status icon index accounting for potential missing items from Config settings */
 	private final void setStatusIconIndex()
 	{
 		this.statusIconIndex = this.itemID - Config.scrollStartIndex();

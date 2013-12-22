@@ -3,29 +3,24 @@ package coolalias.arcanelegacy.blocks;
 import java.util.Random;
 
 import net.minecraft.world.World;
-import coolalias.arcanelegacy.ArcaneLegacy;
 
 public class BlockMagicLightTicking extends BlockMagicLight
 {
-	public BlockMagicLightTicking(int par1)
-	{
+	public BlockMagicLightTicking(int par1) {
 		super(par1);
 		this.setTickRandomly(true);
 	}
 
-	/** Called whenever the block is added into the world. Args: world, x, y, z */
 	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
+	public void onBlockAdded(World world, int x, int y, int z) {
 		int l = world.getBlockMetadata(x, y, z);
 		if (l < 1) { world.setBlockMetadataWithNotify(x, y, z, 1, 2); }
 	}
 
-	/** Ticks the block if it's been scheduled */
 	@Override
-	public void updateTick(World world, int x, int y, int z, Random par5Random)
+	public void updateTick(World world, int x, int y, int z, Random rand)
 	{
-		super.updateTick(world, x, y, z, par5Random);
+		super.updateTick(world, x, y, z, rand);
 
 		int l = world.getBlockMetadata(x, y, z);
 
@@ -43,10 +38,6 @@ public class BlockMagicLightTicking extends BlockMagicLight
 		}
 	}
 
-	/** How many world ticks before ticking */
 	@Override
-	public int tickRate(World par1World)
-	{
-		return 10;
-	}
+	public int tickRate(World world) { return 10; }
 }

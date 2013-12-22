@@ -8,15 +8,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BaseModItem extends Item
 {
-	public BaseModItem(int par1)
-	{
-		super(par1);
-	}
+	public BaseModItem(int par1) { super(par1); }
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void registerIcons(IconRegister iconRegister)
-	{
-		this.itemIcon = iconRegister.registerIcon(ModInfo.ID + ":" + this.getUnlocalizedName().substring(5).toLowerCase());
+	public void registerIcons(IconRegister iconRegister) {
+		itemIcon = iconRegister.registerIcon(ModInfo.ID + ":" + getUnlocalizedName().substring(5).toLowerCase());
 	}
 }

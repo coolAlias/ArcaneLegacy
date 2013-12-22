@@ -1,14 +1,14 @@
 package coolalias.arcanelegacy.inventory;
 
-import coolalias.arcanelegacy.tileentity.TileEntityMortarPestle;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import coolalias.arcanelegacy.tileentity.TileEntityMortarPestle;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ContainerMortarPestle extends Container
 {
@@ -19,31 +19,27 @@ public class ContainerMortarPestle extends Container
 	private static final int INV_START = TileEntityMortarPestle.INV_SIZE, INV_END = INV_START+26,
 			HOTBAR_START = INV_END+1, HOTBAR_END= HOTBAR_START+8;
 
-	public ContainerMortarPestle(InventoryPlayer inventoryPlayer, TileEntityMortarPestle tileEntity)
+	public ContainerMortarPestle(InventoryPlayer inv, TileEntityMortarPestle tileEntity)
 	{
 		mortarPestle = tileEntity;
 		addSlotToContainer(new SlotMortarPestle(tileEntity, TileEntityMortarPestle.GRIND_BASE, 56, 35, true));
 		addSlotToContainer(new SlotMortarPestle(tileEntity, TileEntityMortarPestle.GRIND_RESULT, 116, 34, false));
 
-		for (int invRow = 0; invRow < 3; ++invRow)
-		{
-			for (int invCol = 0; invCol < 9; ++invCol)
-			{
-				addSlotToContainer(new Slot(inventoryPlayer, invCol + invRow * 9 + 9, 8 + invCol * 18, 84 + invRow * 18));
+		for (int i = 0; i < 3; ++i) {
+			for (int j = 0; j < 9; ++j) {
+				addSlotToContainer(new Slot(inv, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
 			}
 		}
 
-		for (int actionBar = 0; actionBar < 9; ++actionBar)
-		{
-			addSlotToContainer(new Slot(inventoryPlayer, actionBar, 8 + actionBar * 18, 142));
+		for (int actionBar = 0; actionBar < 9; ++actionBar) {
+			addSlotToContainer(new Slot(inv, actionBar, 8 + actionBar * 18, 142));
 		}
 	}
 
 	@Override
-	public void addCraftingToCrafters(ICrafting par1ICrafting)
-	{
-		super.addCraftingToCrafters(par1ICrafting);
-		par1ICrafting.sendProgressBarUpdate(this, 0, mortarPestle.grinderCookTime);
+	public void addCraftingToCrafters(ICrafting crafters) {
+		super.addCraftingToCrafters(crafters);
+		crafters.sendProgressBarUpdate(this, 0, mortarPestle.grinderCookTime);
 	}
 
 	@Override
@@ -64,9 +60,10 @@ public class ContainerMortarPestle extends Container
 		lastGrindTime = mortarPestle.grinderCookTime;
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
-	public void updateProgressBar(int par1, int par2) {
-		if (par1 == 0) { mortarPestle.grinderCookTime = par2; }
+	public void updateProgressBar(int bar, int value) {
+		if (bar == 0) { mortarPestle.grinderCookTime = value; }
 	}
 
 	@Override
@@ -74,7 +71,6 @@ public class ContainerMortarPestle extends Container
 		return mortarPestle.isUseableByPlayer(player);
 	}
 
-	/** Called when a player shift-clicks on a slotIndex. You must override this or you will crash when someone does that. */
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityPlayer, int slotIndex)
 	{
@@ -123,17 +119,13 @@ public class ContainerMortarPestle extends Container
 				}
 			}
 
-			if (itemstack1.stackSize == 0)
-			{
+			if (itemstack1.stackSize == 0) {
 				slot.putStack((ItemStack) null);
-			}
-			else
-			{
+			} else {
 				slot.onSlotChanged();
 			}
 
-			if (itemstack1.stackSize == itemstack.stackSize)
-			{
+			if (itemstack1.stackSize == itemstack.stackSize) {
 				return null;
 			}
 

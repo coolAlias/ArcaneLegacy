@@ -1,79 +1,61 @@
 package coolalias.arcanelegacy.inventory;
 
-import coolalias.arcanelegacy.spells.SpellRecipes;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
+import coolalias.arcanelegacy.spells.SpellRecipes;
 
 public class SlotArcaneInscriber extends Slot
 {
 	/** The player that is using the GUI where this slot resides. */
 	private EntityPlayer thePlayer;
-	private int field_75228_b;
 
-	public SlotArcaneInscriber(EntityPlayer player, IInventory inventory, int par3, int par4, int par5)
-	{
-		super(inventory, par3, par4, par5);
+	private int amount_crafted;
+
+	public SlotArcaneInscriber(EntityPlayer player, IInventory inventory, int index, int xPos, int yPos) {
+		super(inventory, index, xPos, yPos);
 		this.thePlayer = player;
 	}
 
-	/**
-	 * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
-	 */
 	@Override
 	public boolean isItemValid(ItemStack itemstack) {
 		return false;
 	}
 
-	/**
-	 * Decrease the size of the stack in slot (first int arg) by the amount of the second int arg. Returns the new
-	 * stack.
-	 */
 	@Override
-	public ItemStack decrStackSize(int par1)
+	public ItemStack decrStackSize(int amount)
 	{
 		if (this.getHasStack()) {
-			this.field_75228_b += Math.min(par1, this.getStack().stackSize);
+			this.amount_crafted += Math.min(amount, this.getStack().stackSize);
 		}
 
-		return super.decrStackSize(par1);
+		return super.decrStackSize(amount);
 	}
 
 	@Override
-	public void onPickupFromSlot(EntityPlayer player, ItemStack itemstack)
-	{
+	public void onPickupFromSlot(EntityPlayer player, ItemStack itemstack) {
 		this.onCrafting(itemstack);
 		super.onPickupFromSlot(player, itemstack);
 	}
 
-	/**
-	 * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood. Typically increases an
-	 * internal count then calls onCrafting(item).
-	 */
 	@Override
-	protected void onCrafting(ItemStack par1ItemStack, int par2)
-	{
-		this.field_75228_b += par2;
-		this.onCrafting(par1ItemStack);
+	protected void onCrafting(ItemStack itemstack, int amount) {
+		this.amount_crafted += amount;
+		this.onCrafting(itemstack);
 	}
 
-	/**
-	 * The itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood.
-	 */
 	@Override
-	protected void onCrafting(ItemStack par1ItemStack)
+	protected void onCrafting(ItemStack itemstack)
 	{
-		par1ItemStack.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.field_75228_b);
+		itemstack.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.amount_crafted);
 
 		if (!this.thePlayer.worldObj.isRemote)
 		{
-			int i = this.field_75228_b;
-			float f = SpellRecipes.spells().getExperience(par1ItemStack);
+			int i = this.amount_crafted;
+			float f = SpellRecipes.spells().getExperience(itemstack);
 			int j;
 
 			if (f == 0.0F)
@@ -100,79 +82,27 @@ public class SlotArcaneInscriber extends Slot
 			}
 		}
 
-		this.field_75228_b = 0;
+		this.amount_crafted = 0;
 	}
 }
 
-class SlotArcaneInscriberDischarge extends Slot
-{
-	private int field_75228_b;
-
-	public SlotArcaneInscriberDischarge(IInventory inventory, int par3, int par4, int par5) {
-		super(inventory, par3, par4, par5);
+class SlotArcaneInscriberDischarge extends Slot {
+	public SlotArcaneInscriberDischarge(IInventory inventory, int index, int xPos, int yPos) {
+		super(inventory, index, xPos, yPos);
 	}
 
-	/**
-	 * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
-	 */
 	@Override
-	public boolean isItemValid(ItemStack itemstack) {
-		return false;
-	}
-
-	/**
-	 * Decrease the size of the stack in slot (first int arg) by the amount of the second int arg. Returns the new
-	 * stack.
-	 */
-	public ItemStack decrStackSize(int par1)
-	{
-		if (this.getHasStack()) {
-			this.field_75228_b += Math.min(par1, this.getStack().stackSize);
-		}
-
-		return super.decrStackSize(par1);
-	}
+	public boolean isItemValid(ItemStack itemstack) { return false; }
 }
 
-class SlotArcaneInscriberRecipe extends Slot
-{
-	private int field_75228_b;
-
-	public SlotArcaneInscriberRecipe(IInventory inventory, int par3, int par4, int par5) {
-		super(inventory, par3, par4, par5);
-	}
-
-	/**
-	 * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
-	 */
-	@Override
-	public boolean isItemValid(ItemStack itemstack) {
-		return false;
-	}
-	
-	/**
-     * Return whether this slot's stack can be taken from this slot.
-     */
-	@Override
-    public boolean canTakeStack(EntityPlayer player) {
-        return false;
-    }
-
-	/**
-	 * Decrease the size of the stack in slot (first int arg) by the amount of the second int arg. Returns the new
-	 * stack.
-	 */
-	@Override
-	public ItemStack decrStackSize(int par1)
-	{
-		if (this.getHasStack()) {
-			this.field_75228_b += Math.min(par1, this.getStack().stackSize);
-		}
-
-		return super.decrStackSize(par1);
+class SlotArcaneInscriberRecipe extends Slot {
+	public SlotArcaneInscriberRecipe(IInventory inventory, int index, int xPos, int yPos) {
+		super(inventory, index, xPos, yPos);
 	}
 
 	@Override
-	public void onPickupFromSlot(EntityPlayer player, ItemStack itemstack) {}
+	public boolean isItemValid(ItemStack itemstack) { return false; }
+
+	@Override
+	public boolean canTakeStack(EntityPlayer player) { return false; }
 }
-

@@ -1,28 +1,18 @@
 package coolalias.arcanelegacy.inventory;
 
-import coolalias.arcanelegacy.item.ItemMagicBag;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import coolalias.arcanelegacy.item.ItemMagicBag;
 
 public class SlotMagicBag extends Slot
 {
-	public SlotMagicBag(IInventory par1iInventory, int par2, int par3, int par4)
-	{
-		super(par1iInventory, par2, par3, par4);
+	public SlotMagicBag(IInventory inv, int index, int xPos, int yPos) {
+		super(inv, index, xPos, yPos);
 	}
-	
-	// This is the only method we need to override so that
-	// we can't place our inventory-storing Item within
-	// its own inventory (thus making it permanently inaccessible)
-	// as well as preventing abuse of storing backpacks within backpacks
-	/**
-	 * Check if the stack is a valid item for this slot.
-	 */
+
 	@Override
-	public boolean isItemValid(ItemStack itemstack)
-	{
-		// Everything returns true except an instance of our Item
+	public boolean isItemValid(ItemStack itemstack) {
 		return !(itemstack.getItem() instanceof ItemMagicBag);
 	}
 }

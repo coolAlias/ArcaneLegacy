@@ -15,11 +15,10 @@ public class ContainerWand extends Container
 	private static final int ARMOR_START = InventoryWand.INV_SIZE, ARMOR_END = ARMOR_START+3, INV_START = ARMOR_END+1,
 			INV_END = INV_START+26, HOTBAR_START = INV_END+1, HOTBAR_END = HOTBAR_START+8;
 
-	public ContainerWand(EntityPlayer par1Player, InventoryPlayer inventoryPlayer, InventoryWand inventoryWand)
+	public ContainerWand(EntityPlayer player, InventoryPlayer inv, InventoryWand wand)
 	{
-		this.inventory = inventoryWand;
-
-		int i;
+		int i = 0;
+		this.inventory = wand;		
 
 		// WAND INVENTORY
 		for (i = 0; i < InventoryWand.INV_SIZE; ++i) {
@@ -28,22 +27,22 @@ public class ContainerWand extends Container
 
 		// ARMOR SLOTS
 		for (i = 0; i < 4; ++i) {
-			addSlotToContainer(new SlotArmor(par1Player, inventoryPlayer, inventoryPlayer.getSizeInventory() - 1 - i, 8, 8 + i * 18, i));
+			addSlotToContainer(new SlotArmor(player, inv, inv.getSizeInventory() - 1 - i, 8, 8 + i * 18, i));
 		}
 
 		// PLAYER INVENTORY
 		for (i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
-				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+				addSlotToContainer(new Slot(inv, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
 			}
 		}
-		
+
 		// PLAYER ACTION BAR
 		for (i = 0; i < 9; ++i) {
-			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 142));
+			addSlotToContainer(new Slot(inv, i, 8 + i * 18, 142));
 		}
 	}
-	
+
 	/**
 	 * Returns index of slot that is 'active'
 	 */
@@ -57,22 +56,19 @@ public class ContainerWand extends Container
 	public final void nextActiveSlot() {
 		((InventoryWand) inventory).nextActiveSlot();
 	}
-	
+
 	/**
 	 * Sets the active slot index to the previous index within the inventory size
 	 */
 	public final void prevActiveSlot() {
 		((InventoryWand) inventory).prevActiveSlot();
 	}
-	
+
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
 		return inventory.isUseableByPlayer(player);
 	}
 
-	/**
-	 * Called when a player shift-clicks on a slot. You must override this or you will crash when someone does that.
-	 */
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int par2)
 	{
@@ -136,17 +132,13 @@ public class ContainerWand extends Container
 				}
 			}
 
-			if (itemstack1.stackSize == 0)
-			{
+			if (itemstack1.stackSize == 0) {
 				slot.putStack((ItemStack) null);
-			}
-			else
-			{
+			} else {
 				slot.onSlotChanged();
 			}
 
-			if (itemstack1.stackSize == itemstack.stackSize)
-			{
+			if (itemstack1.stackSize == itemstack.stackSize) {
 				return null;
 			}
 
@@ -197,7 +189,7 @@ public class ContainerWand extends Container
 				}
 
 				if (par4) { --k; }
-				
+
 				else { ++k; }
 			}
 		}
@@ -205,7 +197,7 @@ public class ContainerWand extends Container
 		if (par1ItemStack.stackSize > 0)
 		{
 			if (par4) { k = par3 - 1; }
-			
+
 			else { k = par2; }
 
 			while (!par4 && k < par3 || par4 && k >= par2)
@@ -235,7 +227,7 @@ public class ContainerWand extends Container
 				}
 
 				if (par4) { --k; }
-				
+
 				else { ++k; }
 			}
 		}

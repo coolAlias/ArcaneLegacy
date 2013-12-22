@@ -1,10 +1,5 @@
 package coolalias.arcanelegacy.tileentity;
 
-import coolalias.arcanelegacy.blocks.BlockMortarPestle;
-import coolalias.arcanelegacy.item.ALItems;
-import coolalias.arcanelegacy.item.ItemDust;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -13,14 +8,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import coolalias.arcanelegacy.blocks.BlockMortarPestle;
+import coolalias.arcanelegacy.item.ALItems;
+import coolalias.arcanelegacy.item.ItemDust;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityMortarPestle extends TileEntity implements ISidedInventory
 {
 	private static final int[] slots_top = new int[] {0};
 	private static final int[] slots_bottom = new int[] {2, 1};
 	private static final int[] slots_sides = new int[] {1};
-
-	private String displayName;
 
 	/** Inventory slot constants */
 	public static final int INV_SIZE = 2, GRIND_BASE = 0, GRIND_RESULT = 1;
@@ -37,9 +35,7 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 	/** Number of ticks for which the current item has been grinding. */
 	public int grinderCookTime;
 
-	public TileEntityMortarPestle() {
-		setGuiDisplayName("Mortar and Pestle");
-	}
+	public TileEntityMortarPestle() {}
 
 	@Override
 	public int getSizeInventory() {
@@ -93,23 +89,12 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 
 	@Override
 	public String getInvName() {
-		return isInvNameLocalized() ? displayName : "container.mortarpestle";
+		return "Mortar and Pestle";
 	}
 
-	/**
-	 * If this returns false, the inventory name will be used as an unlocalized name, and translated into the player's
-	 * language. Otherwise it will be used directly.
-	 */
 	@Override
 	public boolean isInvNameLocalized() {
-		return displayName != null && displayName.length() > 0;
-	}
-
-	/**
-	 * Sets the custom display name to use when opening a GUI linked to this tile entity.
-	 */
-	public void setGuiDisplayName(String par1Str) {
-		displayName = par1Str;
+		return true;
 	}
 
 	@Override
@@ -231,36 +216,21 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 	@Override
 	public void closeChest() {}
 
-	/**
-	 * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
-	 */
 	@Override
 	public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack) {
 		return par1 != GRIND_RESULT && isItemGrindable(par2ItemStack);
 	}
 
-	/**
-	 * Returns an array containing the indices of the slots that can be accessed by automation on the given side of this
-	 * block.
-	 */
 	@Override
 	public int[] getAccessibleSlotsFromSide(int par1) {
 		return par1 == 0 ? slots_bottom : (par1 == 1 ? slots_top : slots_sides);
 	}
 
-	/**
-	 * Returns true if automation can insert the given item in the given slot from the given side.
-	 * Args: Slot, item, side
-	 */
 	@Override
 	public boolean canInsertItem(int par1, ItemStack par2ItemStack, int par3) {
 		return isItemValidForSlot(par1, par2ItemStack);
 	}
 
-	/**
-	 * Returns true if automation can extract the given item in the given slot from the given side.
-	 * Args: Slot, item, side
-	 */
 	@Override
 	public boolean canExtractItem(int slot, ItemStack par2ItemStack, int side) {
 		return side != 0 || slot != GRIND_BASE;
@@ -271,7 +241,6 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 	{
 		super.readFromNBT(compound);
 		NBTTagList items = compound.getTagList("Items");
-		//grindInv = new ItemStack[grindInv.length];
 
 		for (int i = 0; i < items.tagCount(); ++i)
 		{
@@ -285,10 +254,6 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 
 		grinderBurnTime = compound.getShort("BurnTime");
 		grinderCookTime = compound.getShort("CookTime");
-
-		if (compound.hasKey("CustomName")) {
-			displayName = compound.getString("CustomName");
-		}
 	}
 
 	@Override
@@ -313,10 +278,6 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 		}
 
 		compound.setTag("Items", items);
-
-		if (isInvNameLocalized()) {
-			compound.setString("CustomName", displayName);
-		}
 	}
 
 	/**

@@ -1,13 +1,5 @@
 package coolalias.arcanelegacy.tileentity;
 
-import coolalias.arcanelegacy.blocks.ALBlocks;
-import coolalias.arcanelegacy.blocks.BlockArcaneInfuser;
-import coolalias.arcanelegacy.inventory.ContainerArcaneInfuser;
-import coolalias.arcanelegacy.item.ALItems;
-import coolalias.arcanelegacy.item.ItemDust;
-import coolalias.arcanelegacy.item.crafting.ArcaneInfuserRecipes;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -17,6 +9,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import coolalias.arcanelegacy.blocks.ALBlocks;
+import coolalias.arcanelegacy.blocks.BlockArcaneInfuser;
+import coolalias.arcanelegacy.inventory.ContainerArcaneInfuser;
+import coolalias.arcanelegacy.item.ALItems;
+import coolalias.arcanelegacy.item.ItemDust;
+import coolalias.arcanelegacy.item.crafting.ArcaneInfuserRecipes;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityArcaneInfuser extends TileEntity implements ISidedInventory
 {
@@ -36,10 +36,7 @@ public class TileEntityArcaneInfuser extends TileEntity implements ISidedInvento
 	/** The number of ticks that the current item has been cooking for */
 	public int infuserCookTime;
 
-	private String displayName;
-
 	public TileEntityArcaneInfuser() {
-		this.setGuiDisplayName("Arcane Infuser");
 		infuserInventory = new ItemStack[4];
 	}
 
@@ -53,10 +50,6 @@ public class TileEntityArcaneInfuser extends TileEntity implements ISidedInvento
 		return this.infuserInventory[slot];
 	}
 
-	/**
-	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-	 * new stack.
-	 */
 	@Override
 	public ItemStack decrStackSize(int slot, int amount)
 	{
@@ -99,16 +92,12 @@ public class TileEntityArcaneInfuser extends TileEntity implements ISidedInvento
 
 	@Override
 	public String getInvName() {
-		return this.isInvNameLocalized() ? this.displayName : "container.arcaneinfuser";
+		return "Arcane Infuser";
 	}
 
 	@Override
 	public boolean isInvNameLocalized() {
-		return this.displayName != null && this.displayName.length() > 0;
-	}
-
-	public void setGuiDisplayName(String par1Str) {
-		this.displayName = par1Str;
+		return true;
 	}
 
 	@Override
@@ -178,10 +167,6 @@ public class TileEntityArcaneInfuser extends TileEntity implements ISidedInvento
 		return this.infuserBurnTime > 0;
 	}
 
-	/**
-	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count
-	 * ticks and creates a new spawn inside its implementation.
-	 */
 	@Override
 	public void updateEntity()
 	{
@@ -354,11 +339,6 @@ public class TileEntityArcaneInfuser extends TileEntity implements ISidedInvento
 		this.infuserBurnTime = compound.getShort("BurnTime");
 		this.infuserCookTime = compound.getShort("CookTime");
 		this.currentItemBurnTime = getItemBurnTime(this.infuserInventory[1]);
-
-		if (compound.hasKey("CustomName"))
-		{
-			this.displayName = compound.getString("CustomName");
-		}
 	}
 
 	@Override
@@ -383,10 +363,5 @@ public class TileEntityArcaneInfuser extends TileEntity implements ISidedInvento
 		}
 
 		compound.setTag("Items", items);
-
-		if (this.isInvNameLocalized()) {
-			compound.setString("CustomName", this.displayName);
-		}
 	}
-
 }
