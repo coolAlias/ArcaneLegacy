@@ -353,7 +353,7 @@ public class ALItems
 
 		// MISCELLANEOUS ITEM RECIPES
 		if (Config.enableMagicBagRecipe()) {
-			GameRegistry.addRecipe(new ItemStack(ALItems.magicBag), new Object[] {"XZX","XYX","XXX", 'X', Item.leather.itemID, 'Y', Item.eyeOfEnder.itemID, 'Z', Item.silk.itemID});
+			GameRegistry.addRecipe(new ItemStack(ALItems.magicBag), "XZX","XYX","XXX", 'X', Item.leather.itemID, 'Y', Item.eyeOfEnder.itemID, 'Z', Item.silk.itemID);
 		}
 	}
 }
