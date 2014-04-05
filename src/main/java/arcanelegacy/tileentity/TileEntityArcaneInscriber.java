@@ -13,14 +13,14 @@ import arcanelegacy.spells.SpellRecipes;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implements ISidedInventory//TileEntity implements ISidedInventory
+public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implements ISidedInventory
 {
 	private static final int[] slots_top = new int[] {0};
 	private static final int[] slots_bottom = new int[] {2, 1};
 	private static final int[] slots_sides = new int[] {1};
 
 	/** Array bounds = number of slots in ContainerArcaneInscriber */
-	private ItemStack[] inscriberInventory = new ItemStack[ContainerArcaneInscriber.INV_START];
+	private final ItemStack[] inventory;
 
 	/** Time required to scribe a single scroll, amount of 'power' a charged rune provides */
 	private static final int INSCRIBE_TIME = 100, RUNE_CHARGE_TIME = 400;
@@ -31,54 +31,52 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 	/** The number of ticks that the current scroll has been inscribing for */
 	public int inscribeProgressTime;
 
-	public TileEntityArcaneInscriber() {}
+	public TileEntityArcaneInscriber() {
+		inventory = new ItemStack[ContainerArcaneInscriber.INV_START];
+	}
+
+	@Override
+	public boolean canUpdate() {
+		return true;
+	}
 
 	@Override
 	public int getSizeInventory() {
-		return inscriberInventory.length;
+		return inventory.length;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		return inscriberInventory[slot];
+		return inventory[slot];
 	}
 
 	@Override
-	public ItemStack decrStackSize(int slot, int amount)
-	{
+	public ItemStack decrStackSize(int slot, int amount) {
 		ItemStack stack = getStackInSlot(slot);
-
-		if(stack != null)
-		{
-			if(stack.stackSize > amount)
-			{
+		if (stack != null) {
+			if(stack.stackSize > amount) {
 				stack = stack.splitStack(amount);
-				this.onInventoryChanged();
+				onInventoryChanged();
 			} else {
 				setInventorySlotContents(slot, null);
 			}
 		}
-
 		return stack;
 	}
 
 	@Override
-	public ItemStack getStackInSlotOnClosing(int slot)
-	{
+	public ItemStack getStackInSlotOnClosing(int slot) {
 		ItemStack stack = getStackInSlot(slot);
 		setInventorySlotContents(slot, null);
 		return stack;
 	}
 
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack stack)
-	{
-		inscriberInventory[slot] = stack;
-		
-		if (stack != null && stack.stackSize > getInventoryStackLimit()) {
-			stack.stackSize = getInventoryStackLimit();
+	public void setInventorySlotContents(int slot, ItemStack itemstack) {
+		inventory[slot] = itemstack;
+		if (itemstack != null && itemstack.stackSize > getInventoryStackLimit()) {
+			itemstack.stackSize = getInventoryStackLimit();
 		}
-		
 		onInventoryChanged();
 	}
 
@@ -135,10 +133,10 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 			--currentInscribeTime;
 
 			// Container recipe doesn't match current non-null InscribingResult
-			flag1 = (inscriberInventory[ContainerArcaneInscriber.RECIPE] != getCurrentRecipe() && getCurrentRecipe() != null);
+			flag1 = (inventory[ContainerArcaneInscriber.RECIPE] != getCurrentRecipe() && getCurrentRecipe() != null);
 			// Recipe changed - reset timer
 			if (flag1) {
-				inscriberInventory[ContainerArcaneInscriber.RECIPE] = getCurrentRecipe();
+				inventory[ContainerArcaneInscriber.RECIPE] = getCurrentRecipe();
 				onInventoryChanged();
 				currentInscribeTime = 0;
 			}
@@ -148,13 +146,13 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 		{
 			if (currentInscribeTime == 0)
 			{
-				flag1 = (inscriberInventory[ContainerArcaneInscriber.RECIPE] != getCurrentRecipe());
-				inscriberInventory[ContainerArcaneInscriber.RECIPE] = getCurrentRecipe();
+				flag1 = (inventory[ContainerArcaneInscriber.RECIPE] != getCurrentRecipe());
+				inventory[ContainerArcaneInscriber.RECIPE] = getCurrentRecipe();
 				// Recipe changed - update inventory
 				if (flag1) { onInventoryChanged(); }
 
 				if (canInscribe()) {
-					currentInscribeTime = getInscriberChargeTime(inscriberInventory[0]);
+					currentInscribeTime = getInscriberChargeTime(inventory[0]);
 				}
 
 				if (currentInscribeTime > 0)
@@ -164,20 +162,20 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 					// Decrement input slots, increment discharge slots
 					for (int i = 0; i < ContainerArcaneInscriber.RUNE_SLOTS; ++i)
 					{
-						if (inscriberInventory[ContainerArcaneInscriber.INPUT[i]] != null)
+						if (inventory[ContainerArcaneInscriber.INPUT[i]] != null)
 						{
-							--inscriberInventory[ContainerArcaneInscriber.INPUT[i]].stackSize;
-							if (inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]] != null) {
-								++inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]].stackSize;
+							--inventory[ContainerArcaneInscriber.INPUT[i]].stackSize;
+							if (inventory[ContainerArcaneInscriber.DISCHARGE[i]] != null) {
+								++inventory[ContainerArcaneInscriber.DISCHARGE[i]].stackSize;
 							}
 							else {
-								ItemStack discharge = new ItemStack(ALItems.runeBasic,1,inscriberInventory[ContainerArcaneInscriber.INPUT[i]].getItemDamage());
-								inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]] = discharge.copy();
+								ItemStack discharge = new ItemStack(ALItems.runeBasic,1,inventory[ContainerArcaneInscriber.INPUT[i]].getItemDamage());
+								inventory[ContainerArcaneInscriber.DISCHARGE[i]] = discharge.copy();
 							}
 
-							if (inscriberInventory[ContainerArcaneInscriber.INPUT[i]].stackSize == 0)
+							if (inventory[ContainerArcaneInscriber.INPUT[i]].stackSize == 0)
 							{
-								inscriberInventory[ContainerArcaneInscriber.INPUT[i]] = inscriberInventory[ContainerArcaneInscriber.INPUT[i]].getItem().getContainerItemStack(inscriberInventory[ContainerArcaneInscriber.INPUT[i]]);
+								inventory[ContainerArcaneInscriber.INPUT[i]] = inventory[ContainerArcaneInscriber.INPUT[i]].getItem().getContainerItemStack(inventory[ContainerArcaneInscriber.INPUT[i]]);
 							}
 						}
 					}
@@ -222,18 +220,15 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 		boolean canInscribe = true;
 
 		// Still time remaining to inscribe current recipe, check if blank scrolls available
-		if (isInscribing() && inscriberInventory[ContainerArcaneInscriber.RECIPE] != null)
-		{
-			canInscribe = (inscriberInventory[ContainerArcaneInscriber.BLANK_SCROLL] == null ? false : true);
+		if (isInscribing() && inventory[ContainerArcaneInscriber.RECIPE] != null) {
+			canInscribe = (inventory[ContainerArcaneInscriber.BLANK_SCROLL] == null ? false : true);
 		}
 		// No charged rune in first input slot
-		else if (inscriberInventory[ContainerArcaneInscriber.INPUT[0]] == null)
-		{
+		else if (inventory[ContainerArcaneInscriber.INPUT[0]] == null) {
 			canInscribe = false;
 		}
 		// No blank scrolls to inscribe
-		else if (inscriberInventory[ContainerArcaneInscriber.BLANK_SCROLL] == null)
-		{
+		else if (inventory[ContainerArcaneInscriber.BLANK_SCROLL] == null) {
 			canInscribe = false;
 		}
 		// Check if any of the discharge slots are full
@@ -241,43 +236,46 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 		{
 			for (int i = 0; i < ContainerArcaneInscriber.RUNE_SLOTS && canInscribe; ++i)
 			{
-				if (inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]] != null)
-				{
+				if (inventory[ContainerArcaneInscriber.DISCHARGE[i]] != null) {
 					// Check if input[i] and discharge[i] are mismatched
-					if (inscriberInventory[ContainerArcaneInscriber.INPUT[i]] != null)
-					{
-						canInscribe = ((inscriberInventory[ContainerArcaneInscriber.INPUT[i]].getItemDamage()
-								== inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]].getItemDamage())
-								&& inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]].stackSize
-								< inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]].getMaxStackSize());
-					}
-					else
-					{
-						canInscribe = inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]].stackSize < inscriberInventory[ContainerArcaneInscriber.DISCHARGE[i]].getMaxStackSize();
+					if (inventory[ContainerArcaneInscriber.INPUT[i]] != null) {
+						canInscribe = ((inventory[ContainerArcaneInscriber.INPUT[i]].getItemDamage()
+								== inventory[ContainerArcaneInscriber.DISCHARGE[i]].getItemDamage())
+								&& inventory[ContainerArcaneInscriber.DISCHARGE[i]].stackSize
+								< inventory[ContainerArcaneInscriber.DISCHARGE[i]].getMaxStackSize());
+					} else {
+						canInscribe = inventory[ContainerArcaneInscriber.DISCHARGE[i]].stackSize < inventory[ContainerArcaneInscriber.DISCHARGE[i]].getMaxStackSize();
 					}
 				}
 			}
 		}
 
-		if (canInscribe)
-		{
-			ItemStack itemstack = getCurrentRecipe();
+		if (canInscribe) {
+			ItemStack recipe = getCurrentRecipe();
 			// No recipe, check if stored recipe
-			if (itemstack == null) { itemstack = inscriberInventory[ContainerArcaneInscriber.RECIPE]; }
+			if (recipe == null) {
+				recipe = inventory[ContainerArcaneInscriber.RECIPE];
+			}
 			// Invalid recipe
-			if (itemstack == null) return false;
+			if (recipe == null) {
+				return false;
+			}
 			// Recipe is different from the current recipe
-			if (inscriberInventory[ContainerArcaneInscriber.RECIPE] != null && !inscriberInventory[ContainerArcaneInscriber.RECIPE].isItemEqual(itemstack)) return false;
+			if (!recipe.isItemEqual(inventory[ContainerArcaneInscriber.RECIPE])) {
+				return false;
+			}
 			// Output slot is empty, inscribe away!
-			if (inscriberInventory[ContainerArcaneInscriber.OUTPUT] == null) return true;
+			if (inventory[ContainerArcaneInscriber.OUTPUT] == null) {
+				return true;
+			}
 			// Current scroll in output slot is different than recipe output
-			if (!inscriberInventory[ContainerArcaneInscriber.OUTPUT].isItemEqual(itemstack)) return false;
+			if (!inventory[ContainerArcaneInscriber.OUTPUT].isItemEqual(recipe)) {
+				return false;
+			}
 			// Inscribing may surpass stack size limit
-			int result = inscriberInventory[ContainerArcaneInscriber.OUTPUT].stackSize + itemstack.stackSize;
-			return (result <= getInventoryStackLimit() && result <= itemstack.getMaxStackSize());
-		}
-		else
-		{
+			int result = inventory[ContainerArcaneInscriber.OUTPUT].stackSize + recipe.stackSize;
+			return (result <= getInventoryStackLimit() && result <= recipe.getMaxStackSize());
+		} else {
 			return canInscribe;
 		}
 	}
@@ -286,60 +284,44 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 	 * Returns the crafting result of runes currently in place
 	 */
 	public ItemStack getCurrentRecipe() {
-		return SpellRecipes.spells().getInscribingResult(inscriberInventory);
+		return SpellRecipes.spells().getInscribingResult(inventory);
 	}
 
 	/**
 	 * Inscribe a blank scroll with the last current recipe
 	 */
-	public void inscribeScroll()
-	{
-		if (canInscribe())
-		{
-			ItemStack inscribeResult = inscriberInventory[ContainerArcaneInscriber.RECIPE];
-
-			if (inscribeResult != null)
-			{
-				if (inscriberInventory[ContainerArcaneInscriber.OUTPUT] == null)
-				{
-					inscriberInventory[ContainerArcaneInscriber.OUTPUT] = inscribeResult.copy();
-				}
-				else if (inscriberInventory[ContainerArcaneInscriber.OUTPUT].isItemEqual(inscribeResult))
-				{
-					inscriberInventory[ContainerArcaneInscriber.OUTPUT].stackSize += inscribeResult.stackSize;
+	public void inscribeScroll() {
+		if (canInscribe()) {
+			ItemStack result = inventory[ContainerArcaneInscriber.RECIPE];
+			if (result != null) {
+				if (inventory[ContainerArcaneInscriber.OUTPUT] == null) {
+					inventory[ContainerArcaneInscriber.OUTPUT] = result.copy();
+				} else if (inventory[ContainerArcaneInscriber.OUTPUT].isItemEqual(result)) {
+					inventory[ContainerArcaneInscriber.OUTPUT].stackSize += result.stackSize;
 				}
 
-				--inscriberInventory[ContainerArcaneInscriber.BLANK_SCROLL].stackSize;
+				--inventory[ContainerArcaneInscriber.BLANK_SCROLL].stackSize;
 
-				if (inscriberInventory[ContainerArcaneInscriber.BLANK_SCROLL].stackSize <= 0)
-				{
-					inscriberInventory[ContainerArcaneInscriber.BLANK_SCROLL] = null;
+				if (inventory[ContainerArcaneInscriber.BLANK_SCROLL].stackSize <= 0) {
+					inventory[ContainerArcaneInscriber.BLANK_SCROLL] = null;
 				}
 			}
 		}
 	}
 
-	/**
-	 * Returns the number of ticks that the supplied rune will keep
-	 * the inscriber running, or 0 if the rune isn't charged
-	 */
-	public static int getInscriberChargeTime(ItemStack rune)
-	{
-		if (rune != null && rune.itemID == ALItems.runeCharged.itemID) {
-			return RUNE_CHARGE_TIME;
-		} else { return 0; }
+	/** The number of ticks that the rune will keep the inscriber running (0 for uncharged runes) */
+	public static int getInscriberChargeTime(ItemStack rune) {
+		return (rune != null && rune.itemID == ALItems.runeCharged.itemID ? RUNE_CHARGE_TIME : 0);
 	}
 
-	/**
-	 * Return true if item is an energy source (i.e. a charged rune)
-	 */
-	public static boolean isSource(ItemStack itemstack) {
-		return getInscriberChargeTime(itemstack) > 0;
+	/** Return true if item is an energy source (i.e. a charged rune) */
+	public static boolean isSource(ItemStack stack) {
+		return getInscriberChargeTime(stack) > 0;
 	}
 
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
-		return player.getDistanceSq((double)this.xCoord + 0.5D, (double)this.yCoord + 0.5D, (double)this.zCoord + 0.5D) <= 64.0D;
+		return player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64.0D;
 	}
 
 	@Override
@@ -349,14 +331,12 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 	public void closeChest() {}
 
 	@Override
-	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
-	{
+	public boolean isItemValidForSlot(int slot, ItemStack stack) {
 		boolean isValid = false;
-
 		if (slot >= ContainerArcaneInscriber.INPUT[0] && slot <= ContainerArcaneInscriber.INPUT[ContainerArcaneInscriber.RUNE_SLOTS-1]) {
-			isValid = itemstack.getItem().itemID == ALItems.runeCharged.itemID;
+			isValid = stack.getItem().itemID == ALItems.runeCharged.itemID;
 		} else if (slot == ContainerArcaneInscriber.BLANK_SCROLL) {
-			isValid = itemstack.getItem().itemID == ALItems.scrollBlank.itemID;
+			isValid = stack.getItem().itemID == ALItems.scrollBlank.itemID;
 		}
 		return isValid;
 	}
@@ -372,51 +352,39 @@ public class TileEntityArcaneInscriber extends TileEntityEnchantmentTable implem
 	}
 
 	@Override
-	public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
+	public boolean canExtractItem(int slot, ItemStack stack, int side) {
 		return (slot == ContainerArcaneInscriber.OUTPUT || (slot >= ContainerArcaneInscriber.DISCHARGE[0] && slot <= ContainerArcaneInscriber.DISCHARGE[ContainerArcaneInscriber.RUNE_SLOTS-1]));
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound compound)
-	{
+	public void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
 		NBTTagList items = compound.getTagList("Items");
-
-		for (int i = 0; i < items.tagCount(); ++i)
-		{
+		for (int i = 0; i < items.tagCount(); ++i) {
 			NBTTagCompound item = (NBTTagCompound) items.tagAt(i);
 			byte slot = item.getByte("Slot");
-
 			if (slot >= 0 && slot < getSizeInventory()) {
-				setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(item));
+				inventory[slot] = ItemStack.loadItemStackFromNBT(item);
 			}
 		}
-
 		currentInscribeTime = compound.getShort("IncribeTime");
 		inscribeProgressTime = compound.getShort("InscribeProgress");
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound compound)
-	{
+	public void writeToNBT(NBTTagCompound compound) {
 		super.writeToNBT(compound);
-		
-		compound.setShort("InscribeTime", (short) currentInscribeTime);
-		compound.setShort("InscribeProgress", (short) inscribeProgressTime);
-		
 		NBTTagList items = new NBTTagList();
-
-		for (int i = 0; i < getSizeInventory(); ++i)
-		{
-			if (getStackInSlot(i) != null)
-			{
+		for (int i = 0; i < getSizeInventory(); ++i) {
+			if (getStackInSlot(i) != null) {
 				NBTTagCompound item = new NBTTagCompound();
 				item.setByte("Slot", (byte) i);
 				getStackInSlot(i).writeToNBT(item);
 				items.appendTag(item);
 			}
 		}
-
 		compound.setTag("Items", items);
+		compound.setShort("InscribeTime", (short) currentInscribeTime);
+		compound.setShort("InscribeProgress", (short) inscribeProgressTime);
 	}
 }

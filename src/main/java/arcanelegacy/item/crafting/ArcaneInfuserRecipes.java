@@ -1,5 +1,6 @@
 package arcanelegacy.item.crafting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +65,26 @@ public class ArcaneInfuserRecipes
     		break;
     	}
     	return dust;
+    }
+    
+    public void addRecipe(ItemStack output, ItemStack... inputs) {
+    	List<Integer> inputData = new ArrayList<Integer>();
+    	for (ItemStack stack : inputs) {
+    		// update to 1.7.2 by using Item.getIdFromItem(stack.getItem())
+    		inputData.add(stack.itemID);
+    		inputData.add(stack.getItemDamage());
+    	}
+    	metaInfusingList.put(inputData, output);
+    }
+    
+    public ItemStack getRecipe(ItemStack... inputs) {
+    	List<Integer> inputData = new ArrayList<Integer>();
+    	for (ItemStack stack : inputs) {
+    		// update to 1.7.2 by using Item.getIdFromItem(stack.getItem())
+    		inputData.add(stack.itemID);
+    		inputData.add(stack.getItemDamage());
+    	}
+    	return metaInfusingList.get(inputData);
     }
     
     /**

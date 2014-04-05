@@ -6,15 +6,13 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
 import arcanelegacy.blocks.BlockMortarPestle;
 import arcanelegacy.item.ALItems;
 import arcanelegacy.item.ItemDust;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class TileEntityMortarPestle extends TileEntity implements ISidedInventory
+public class TileEntityMortarPestle extends TileEntityInventory implements ISidedInventory
 {
 	private static final int[] slots_top = new int[] {0};
 	private static final int[] slots_bottom = new int[] {2, 1};
@@ -22,9 +20,6 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 
 	/** Inventory slot constants */
 	public static final int INV_SIZE = 2, GRIND_BASE = 0, GRIND_RESULT = 1;
-
-	/** Inventory for this TileEntity */
-	private ItemStack[] grindInv = new ItemStack[INV_SIZE];
 
 	/** Number of ticks mortar & pestle will remain active */
 	public int grinderBurnTime;
@@ -35,56 +30,13 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 	/** Number of ticks for which the current item has been grinding. */
 	public int grinderCookTime;
 
-	public TileEntityMortarPestle() {}
-
-	@Override
-	public int getSizeInventory() {
-		return grindInv.length;
+	public TileEntityMortarPestle() {
+		inventory = new ItemStack[INV_SIZE];
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int slot) {
-		return grindInv[slot];
-	}
-
-	@Override
-	public ItemStack decrStackSize(int slot, int amount)
-	{
-		ItemStack stack = getStackInSlot(slot);
-
-		if(stack != null)
-		{
-			if(stack.stackSize > amount)
-			{
-				stack = stack.splitStack(amount);
-				this.onInventoryChanged();
-			} else {
-				setInventorySlotContents(slot, null);
-			}
-		}
-
-		return stack;
-	}
-
-	@Override
-	public ItemStack getStackInSlotOnClosing(int slot)
-	{
-		ItemStack stack = getStackInSlot(slot);
-		setInventorySlotContents(slot, null);
-		return stack;
-	}
-
-	@Override
-	public void setInventorySlotContents(int slot, ItemStack itemstack)
-	{
-		grindInv[slot] = itemstack;
-
-		if (itemstack != null && itemstack.stackSize > getInventoryStackLimit())
-		{
-			itemstack.stackSize = getInventoryStackLimit();
-		}
-		
-		onInventoryChanged();
+	public boolean canUpdate() {
+		return true;
 	}
 
 	@Override
@@ -119,44 +71,35 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 	}
 
 	@Override
-	public void updateEntity()
-	{
+	public void updateEntity() {
 		boolean updateBlock = isGrinding();
 		boolean flag1 = false;
 
-		if (!worldObj.isRemote)
-		{
-			if (grinderBurnTime == 0 && canGrind())
-			{
+		if (!worldObj.isRemote) {
+			if (grinderBurnTime == 0 && canGrind()) {
 				grinderBurnTime = GRIND_TIME;
 			}
 
-			if (isGrinding() && canGrind())
-			{
+			if (isGrinding() && canGrind()) {
 				++grinderCookTime;
 
-				if (grinderCookTime == GRIND_TIME)
-				{
+				if (grinderCookTime == GRIND_TIME) {
 					grinderCookTime = 0;
 					grindItem();
 					flag1 = true;
 				}
-			}
-			else
-			{
+			} else {
 				grinderBurnTime = 0;
 				grinderCookTime = 0;
 			}
 
-			if (updateBlock != isGrinding())
-			{
+			if (updateBlock != isGrinding()) {
 				flag1 = true;
 				BlockMortarPestle.updateMortarPestleBlockState(isGrinding(), worldObj, xCoord, yCoord, zCoord);
 			}
 		}
 
-		if (flag1)
-		{
+		if (flag1) {
 			onInventoryChanged();
 		}
 	}
@@ -166,14 +109,18 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 	 */
 	private boolean canGrind()
 	{
-		if (grindInv[GRIND_BASE] == null) { return false; }
-		else
-		{
-			ItemStack itemstack = getGrindingResult(grindInv[GRIND_BASE]);
-			if (itemstack == null) return false;
-			if (grindInv[GRIND_RESULT] == null) return true;
-			if (!grindInv[GRIND_RESULT].isItemEqual(itemstack)) return false;
-			int result = grindInv[GRIND_RESULT].stackSize + itemstack.stackSize;
+		if (inventory[GRIND_BASE] == null) {
+			return false;
+		} else {
+			ItemStack itemstack = getGrindingResult(inventory[GRIND_BASE]);
+			if (itemstack == null) {
+				return false;
+			} else if (inventory[GRIND_RESULT] == null) {
+				return true;
+			} else if (!inventory[GRIND_RESULT].isItemEqual(itemstack)) {
+				return false;
+			}
+			int result = inventory[GRIND_RESULT].stackSize + itemstack.stackSize;
 			return (result <= getInventoryStackLimit() && result <= itemstack.getMaxStackSize());
 		}
 	}
@@ -181,26 +128,20 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 	/**
 	 * Turn one item from the source stack into the appropriate ground item in the result stack
 	 */
-	public void grindItem()
-	{
-		if (canGrind())
-		{
-			ItemStack result = getGrindingResult(grindInv[GRIND_BASE]);
+	public void grindItem() {
+		if (canGrind()) {
+			ItemStack result = getGrindingResult(inventory[GRIND_BASE]);
 
-			if (grindInv[GRIND_RESULT] == null)
-			{
-				grindInv[GRIND_RESULT] = result.copy();
-			}
-			else if (grindInv[GRIND_RESULT].isItemEqual(result))
-			{
-				grindInv[GRIND_RESULT].stackSize += result.stackSize;
+			if (inventory[GRIND_RESULT] == null) {
+				inventory[GRIND_RESULT] = result.copy();
+			} else if (inventory[GRIND_RESULT].isItemEqual(result)) {
+				inventory[GRIND_RESULT].stackSize += result.stackSize;
 			}
 
-			--grindInv[GRIND_BASE].stackSize;
+			--inventory[GRIND_BASE].stackSize;
 
-			if (grindInv[GRIND_BASE].stackSize <= 0)
-			{
-				grindInv[GRIND_BASE] = null;
+			if (inventory[GRIND_BASE].stackSize <= 0) {
+				inventory[GRIND_BASE] = null;
 			}
 		}
 	}
@@ -211,73 +152,37 @@ public class TileEntityMortarPestle extends TileEntity implements ISidedInventor
 	}
 
 	@Override
-	public void openChest() {}
-
-	@Override
-	public void closeChest() {}
-
-	@Override
-	public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack) {
-		return par1 != GRIND_RESULT && isItemGrindable(par2ItemStack);
+	public boolean isItemValidForSlot(int par1, ItemStack stack) {
+		return par1 != GRIND_RESULT && isItemGrindable(stack);
 	}
 
 	@Override
-	public int[] getAccessibleSlotsFromSide(int par1) {
-		return par1 == 0 ? slots_bottom : (par1 == 1 ? slots_top : slots_sides);
+	public int[] getAccessibleSlotsFromSide(int side) {
+		return side == 0 ? slots_bottom : (side == 1 ? slots_top : slots_sides);
 	}
 
 	@Override
-	public boolean canInsertItem(int par1, ItemStack par2ItemStack, int par3) {
-		return isItemValidForSlot(par1, par2ItemStack);
+	public boolean canInsertItem(int slot, ItemStack stack, int side) {
+		return isItemValidForSlot(slot, stack);
 	}
 
 	@Override
-	public boolean canExtractItem(int slot, ItemStack par2ItemStack, int side) {
+	public boolean canExtractItem(int slot, ItemStack stack, int side) {
 		return side != 0 || slot != GRIND_BASE;
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound compound)
-	{
+	public void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
-		NBTTagList items = compound.getTagList("Items");
-
-		for (int i = 0; i < items.tagCount(); ++i)
-		{
-			NBTTagCompound item = (NBTTagCompound) items.tagAt(i);
-			byte slot = item.getByte("Slot");
-
-			if (slot >= 0 && slot < getSizeInventory()) {
-				setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(item));
-			}
-		}
-
 		grinderBurnTime = compound.getShort("BurnTime");
 		grinderCookTime = compound.getShort("CookTime");
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound compound)
-	{
+	public void writeToNBT(NBTTagCompound compound) {
 		super.writeToNBT(compound);
-		
 		compound.setShort("BurnTime", (short) grinderBurnTime);
 		compound.setShort("CookTime", (short) grinderCookTime);
-		
-		NBTTagList items = new NBTTagList();
-
-		for (int i = 0; i < getSizeInventory(); ++i)
-		{
-			if (getStackInSlot(i) != null)
-			{
-				NBTTagCompound item = new NBTTagCompound();
-				item.setByte("Slot", (byte)i);
-				getStackInSlot(i).writeToNBT(item);
-				items.appendTag(item);
-			}
-		}
-
-		compound.setTag("Items", items);
 	}
 
 	/**
