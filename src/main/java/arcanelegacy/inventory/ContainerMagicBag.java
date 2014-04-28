@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 public class ContainerMagicBag extends Container
 {
 	/** The Item Inventory for this Container */
-	public final InventoryMagicBag inventory;
+	private final InventoryMagicBag inventory;
 
 	private static final int
 	ARMOR_START = InventoryMagicBag.INV_SIZE, ARMOR_END = ARMOR_START + 3,
@@ -46,12 +46,12 @@ public class ContainerMagicBag extends Container
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer entityplayer) {
-		return true;
+	public boolean canInteractWith(EntityPlayer player) {
+		return inventory.isUseableByPlayer(player);
 	}
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
+	public ItemStack transferStackInSlot(EntityPlayer player, int par2)
 	{
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(par2);
@@ -106,7 +106,7 @@ public class ContainerMagicBag extends Container
 				return null;
 			}
 
-			slot.onPickupFromSlot(par1EntityPlayer, itemstack1);
+			slot.onPickupFromSlot(player, itemstack1);
 		}
 
 		return itemstack;

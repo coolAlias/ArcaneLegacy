@@ -15,18 +15,17 @@ public class InventoryMagicBag implements IInventory
 	public static final int INV_SIZE = 10;
 
 	/** Inventory's size must be same as number of slots you add to the Container class */
-	ItemStack[] inventory = new ItemStack[INV_SIZE];
+	private ItemStack[] inventory = new ItemStack[INV_SIZE];
 
 	/** Provides NBT Tag Compound to reference */
-	private final ItemStack stack;
+	private final ItemStack invStack;
 
-	public InventoryMagicBag(ItemStack itemstack)
-	{
-		stack = itemstack;
-
-		if (!stack.hasTagCompound()) { stack.setTagCompound(new NBTTagCompound()); }
-
-		readFromNBT(stack.getTagCompound());
+	public InventoryMagicBag(ItemStack stack) {
+		invStack = stack;
+		if (!invStack.hasTagCompound()) {
+			invStack.setTagCompound(new NBTTagCompound());
+		}
+		readFromNBT(invStack.getTagCompound());
 	}
 
 	@Override
@@ -40,14 +39,10 @@ public class InventoryMagicBag implements IInventory
 	}
 
 	@Override
-	public ItemStack decrStackSize(int slot, int amount)
-	{
+	public ItemStack decrStackSize(int slot, int amount) {
 		ItemStack stack = getStackInSlot(slot);
-
-		if (stack != null)
-		{
-			if(stack.stackSize > amount)
-			{
+		if (stack != null) {
+			if(stack.stackSize > amount) {
 				stack = stack.splitStack(amount);
 				onInventoryChanged();
 			} else {
@@ -66,14 +61,11 @@ public class InventoryMagicBag implements IInventory
 	}
 
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack itemstack)
-	{
-		inventory[slot] = itemstack;
-
-		if (itemstack != null && itemstack.stackSize > getInventoryStackLimit()) {
-			itemstack.stackSize = getInventoryStackLimit();
+	public void setInventorySlotContents(int slot, ItemStack stack) {
+		inventory[slot] = stack;
+		if (stack != null && stack.stackSize > getInventoryStackLimit()) {
+			stack.stackSize = getInventoryStackLimit();
 		}
-
 		onInventoryChanged();
 	}
 
@@ -93,20 +85,18 @@ public class InventoryMagicBag implements IInventory
 	}
 
 	@Override
-	public void onInventoryChanged()
-	{
-		for (int i = 0; i < getSizeInventory(); ++i)
-		{
-			if (getStackInSlot(i) != null && getStackInSlot(i).stackSize == 0)
+	public void onInventoryChanged() {
+		for (int i = 0; i < getSizeInventory(); ++i) {
+			if (getStackInSlot(i) != null && getStackInSlot(i).stackSize == 0) {
 				inventory[i] = null;
+			}
 		}
-
-		writeToNBT(stack.getTagCompound());
+		writeToNBT(invStack.getTagCompound());
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-		return true;
+	public boolean isUseableByPlayer(EntityPlayer player) {
+		return player.getHeldItem() == invStack;
 	}
 
 	@Override
@@ -121,40 +111,31 @@ public class InventoryMagicBag implements IInventory
 	 * even when this returns false
 	 */
 	@Override
-	public boolean isItemValidForSlot(int slot, ItemStack itemstack) {
-		return !(itemstack.getItem() instanceof ItemMagicBag);
+	public boolean isItemValidForSlot(int slot, ItemStack stack) {
+		return !(stack.getItem() instanceof ItemMagicBag);
 	}
 
-	public void readFromNBT(NBTTagCompound compound)
-	{
-		NBTTagList inventory = compound.getTagList("ItemInventory");
-
-		for (int i = 0; i < inventory.tagCount(); ++i)
-		{
-			NBTTagCompound item = (NBTTagCompound) inventory.tagAt(i);
+	public void readFromNBT(NBTTagCompound compound) {
+		NBTTagList items = compound.getTagList("ItemInventory");
+		for (int i = 0; i < items.tagCount(); ++i) {
+			NBTTagCompound item = (NBTTagCompound) items.tagAt(i);
 			byte slot = item.getByte("Slot");
-
 			if (slot >= 0 && slot < getSizeInventory()) {
-				setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(item));
+				inventory[slot] = ItemStack.loadItemStackFromNBT(item);
 			}
 		}
 	}
 
-	public void writeToNBT(NBTTagCompound compound)
-	{
-		NBTTagList inventory = new NBTTagList();
-
-		for (int i = 0; i < getSizeInventory(); ++i)
-		{
-			if (getStackInSlot(i) != null)
-			{
+	public void writeToNBT(NBTTagCompound compound) {
+		NBTTagList items = new NBTTagList();
+		for (int i = 0; i < getSizeInventory(); ++i) {
+			if (getStackInSlot(i) != null) {
 				NBTTagCompound item = new NBTTagCompound();
 				item.setByte("Slot", (byte) i);
 				getStackInSlot(i).writeToNBT(item);
-				inventory.appendTag(item);
+				items.appendTag(item);
 			}
 		}
-
-		compound.setTag("ItemInventory", inventory);
+		compound.setTag("ItemInventory", items);
 	}
 }

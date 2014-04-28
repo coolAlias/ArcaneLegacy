@@ -19,7 +19,9 @@ public class BlockMagicDarkness extends BlockGeneric
 	}
 
 	@Override
-	public boolean isCollidable() { return false; }
+	public boolean isCollidable() {
+		return false;
+	}
 
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
@@ -27,13 +29,19 @@ public class BlockMagicDarkness extends BlockGeneric
 	}
 
 	@Override
-	public boolean isOpaqueCube() { return false; }
+	public boolean isOpaqueCube() {
+		return false;
+	}
 
 	@Override
-	public int quantityDropped(Random rand) { return 0; }
+	public int quantityDropped(Random rand) {
+		return 0;
+	}
 
 	@Override
-	public boolean canDropFromExplosion(Explosion explosion) { return false; }
+	public boolean canDropFromExplosion(Explosion explosion) {
+		return false;
+	}
 
 	/**
 	 * Checks to see if block at the specified coordinates is destroyed when attempting to place this block.

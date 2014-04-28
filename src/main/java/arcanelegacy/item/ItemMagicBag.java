@@ -12,19 +12,19 @@ import arcanelegacy.inventory.InventoryMagicBag;
 
 public class ItemMagicBag extends BaseModItem
 {
-	public ItemMagicBag(int par1) {
-		super(par1);
-		this.maxStackSize = 1;
+	public ItemMagicBag(int id) {
+		super(id);
+		setMaxStackSize(1);
 	}
 
 	@Override
-	public int getMaxItemUseDuration(ItemStack itemstack) { return 1; }
+	public int getMaxItemUseDuration(ItemStack stack) {
+		return 1;
+	}
 
 	@Override
-	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer player)
-	{
-		if (!world.isRemote)
-		{
+	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+		if (!world.isRemote) {
 			if (!player.isSneaking()) {
 				player.openGui(ArcaneLegacy.instance, ArcaneLegacy.magicBagGuiId, world, (int) player.posX, (int) player.posY, (int) player.posZ);
 			} else {
@@ -32,11 +32,11 @@ public class ItemMagicBag extends BaseModItem
 			}
 		}
 
-		return itemstack;
+		return stack;
 	}
 
 	@Override
-	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean par4) {
+	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
 		list.add(EnumChatFormatting.ITALIC + "A magic bag that holds many items");
 	}
 }

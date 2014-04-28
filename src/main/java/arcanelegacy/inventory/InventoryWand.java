@@ -18,14 +18,14 @@ public class InventoryWand implements IInventory
 
 	private ItemStack[] inventory = new ItemStack[INV_SIZE];
 
-	public InventoryWand(ItemStack itemstack)
-	{
+	public InventoryWand(ItemStack stack) {
 		//System.out.println("[WAND INV] Constructor called");
 		//uniqueID = "";
-		wand = itemstack;		
+		wand = stack;		
 		//uniqueID = UUID.randomUUID().toString();
-		if (!wand.hasTagCompound()) { wand.setTagCompound(new NBTTagCompound()); }
-
+		if (!wand.hasTagCompound()) {
+			wand.setTagCompound(new NBTTagCompound());
+		}
 		readFromNBT(wand.getTagCompound());
 	}
 
@@ -39,24 +39,22 @@ public class InventoryWand implements IInventory
 	/**
 	 * Sets the active slot index to the next index within the inventory size
 	 */
-	public void nextActiveSlot()
-	{
+	public void nextActiveSlot() {
 		byte activeSlot = (byte)(wand.getTagCompound().getByte("WandActiveSlot") + 1);
-
-		if (activeSlot == ACTIVE_SLOT) { activeSlot = 0; }
-
+		if (activeSlot == ACTIVE_SLOT) {
+			activeSlot = 0;
+		}
 		wand.getTagCompound().setByte("WandActiveSlot", (byte) activeSlot);
 	}
 
 	/**
 	 * Sets the active slot index to the previous index within the inventory size
 	 */
-	public void prevActiveSlot()
-	{
+	public void prevActiveSlot() {
 		byte activeSlot = (byte)(wand.getTagCompound().getByte("WandActiveSlot") - 1);
-
-		if (activeSlot < 0) { activeSlot = ACTIVE_SLOT - 1; }
-
+		if (activeSlot < 0) {
+			activeSlot = ACTIVE_SLOT - 1;
+		}
 		wand.getTagCompound().setByte("WandActiveSlot", (byte) activeSlot);
 	}
 
@@ -67,26 +65,21 @@ public class InventoryWand implements IInventory
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		if (slot == ACTIVE_SLOT) { return inventory[wand.getTagCompound().getByte("WandActiveSlot")]; }
-		else { return inventory[slot]; }
+		if (slot == ACTIVE_SLOT) {
+			return inventory[wand.getTagCompound().getByte("WandActiveSlot")];
+		} else {
+			return inventory[slot];
+		}
 	}
 
 	@Override
-	public ItemStack decrStackSize(int slot, int amount)
-	{
+	public ItemStack decrStackSize(int slot, int amount) {
 		ItemStack stack = getStackInSlot(slot);
-
-		if (stack != null)
-		{
-			if (stack.stackSize > amount)
-			{
+		if (stack != null) {
+			if (stack.stackSize > amount) {
 				stack = stack.splitStack(amount);
-
-				if (stack.stackSize == 0) {
-					setInventorySlotContents(slot, null);
-				}
-			}
-			else {
+				onInventoryChanged();
+			} else {
 				setInventorySlotContents(slot, null);
 			}
 		}
@@ -95,25 +88,20 @@ public class InventoryWand implements IInventory
 	}
 
 	@Override
-	public ItemStack getStackInSlotOnClosing(int slot)
-	{
+	public ItemStack getStackInSlotOnClosing(int slot) {
 		ItemStack stack = getStackInSlot(slot);
-
-		if (stack != null) { setInventorySlotContents(slot, null); }
-
+		if (stack != null) {
+			setInventorySlotContents(slot, null);
+		}
 		return stack;
 	}
 
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack itemstack)
-	{
-		inventory[slot] = itemstack;
-
-		if (itemstack != null && itemstack.stackSize > getInventoryStackLimit())
-		{
-			itemstack.stackSize = getInventoryStackLimit();
+	public void setInventorySlotContents(int slot, ItemStack stack) {
+		inventory[slot] = stack;
+		if (stack != null && stack.stackSize > getInventoryStackLimit()) {
+			stack.stackSize = getInventoryStackLimit();
 		}
-
 		onInventoryChanged();
 	}
 
@@ -133,14 +121,12 @@ public class InventoryWand implements IInventory
 	}
 
 	@Override
-	public void onInventoryChanged()
-	{
-		for (int i = 0; i < getSizeInventory(); ++i)
-		{
-			if (getStackInSlot(i) != null && getStackInSlot(i).stackSize == 0)
+	public void onInventoryChanged() {
+		for (int i = 0; i < getSizeInventory(); ++i) {
+			if (getStackInSlot(i) != null && getStackInSlot(i).stackSize == 0) {
 				inventory[i] = null;
+			}
 		}
-
 		writeToNBT(wand.getTagCompound());
 	}
 
@@ -156,8 +142,8 @@ public class InventoryWand implements IInventory
 	public void closeChest() {}
 
 	@Override
-	public boolean isItemValidForSlot(int par1, ItemStack itemstack) {
-		return (itemstack.getItem() instanceof ItemScroll ? true : false);
+	public boolean isItemValidForSlot(int par1, ItemStack stack) {
+		return (stack.getItem() instanceof ItemScroll ? true : false);
 	}
 
 	public void readFromNBT(NBTTagCompound compound)
@@ -177,26 +163,19 @@ public class InventoryWand implements IInventory
 		 */
 
 		NBTTagList items = compound.getTagList("WandInventory");
-
-		for (int i = 0; i < items.tagCount(); ++i)
-		{
+		for (int i = 0; i < items.tagCount(); ++i) {
 			NBTTagCompound item = (NBTTagCompound) items.tagAt(i);
 			byte slot = item.getByte("Slot");
-
 			if (slot >= 0 && slot < getSizeInventory()) {
 				setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(item));
 			}
 		}
 	}
 
-	public void writeToNBT(NBTTagCompound compound)
-	{
+	public void writeToNBT(NBTTagCompound compound) {
 		NBTTagList items = new NBTTagList();
-
-		for (int i = 0; i < getSizeInventory(); ++i)
-		{
-			if (getStackInSlot(i) != null)
-			{
+		for (int i = 0; i < getSizeInventory(); ++i) {
+			if (getStackInSlot(i) != null) {
 				NBTTagCompound item = new NBTTagCompound();
 				item.setByte("Slot", (byte)i);
 				getStackInSlot(i).writeToNBT(item);
